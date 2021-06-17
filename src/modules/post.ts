@@ -1,10 +1,13 @@
 import { Express, Request, Response } from "express";
+import { DataBase } from "./database";
 
 export class POST {
+    db: DataBase;
     constructor(private app: Express) {
         this.app.post('*', (req, res) => {
             this.proccess(req, res);
-        })
+        });
+        this.db = new DataBase();
     }
 
     proccess(req: Request, res: Response) {
@@ -31,7 +34,21 @@ export class POST {
         }
 
         console.log(options);
+
+        switch(action) {
+            case 'get-playlist':
+                this.db.select({
+                    table: 'music'
+                }).then((data) => {
+                    console.log(data);
+                    
+                    res.send(data);
+                })
+                break;
+            default: 
+                res.send({ok: true});
+                break;
+        }
         
-        res.send({ok: true});
     }
 }

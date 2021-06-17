@@ -1,4 +1,5 @@
 import { Server } from "node:http";
+import { connected } from "node:process";
 import { Server as SocketServer } from "socket.io";
 import { DataBase } from "./database";
 import { Image } from "./image";
@@ -20,7 +21,7 @@ export class Socket {
     constructor(private server: Server) {
         this.io = new SocketServer(this.server, {
             cors: {
-                origin: "http://localhost:4300",
+                origin: "*",
                 methods: ["GET", "POST"]
             }
         });
@@ -35,8 +36,10 @@ export class Socket {
 
     initListeners() {
         this.io.on('connection', (socket) => {
-            
-            
+            socket.on('get-room', () => {
+                socket.emit('room-id', this.roomId)
+            })
+
             socket.on('auth', (auth: {admin?: boolean, client?: boolean, room?: string}) => {
                 console.log('AUTH: ', auth);
                 
@@ -53,13 +56,18 @@ export class Socket {
                 
 
                 if(this.sockets[socket.id].client && auth.room && auth.room == this.roomId) {
-                    socket.emit('connected', {
-                        client_auth: true
-                    } as Connection)
+                    let connection: Connection = {
+                        client_auth: true,
+                    }
+                    socket.emit('connected', connection)
                 } else {
-                    socket.emit('connected', {
-                        client_auth: false
-                    } as Connection)
+                    if(!this.sockets[socket.id].client) {
+                        socket.emit('room-id', this.roomId)
+                    } else {
+                        socket.emit('connected', {
+                            client_auth: false
+                        } as Connection)
+                    }
                 }
             });
 
@@ -72,6 +80,16 @@ export class Socket {
 
             socket.on('test-lock', () => {
                 this.volumeLock = !this.volumeLock;
+                this.io.emit('set-volume', {
+                    volume: this.volume,
+                    locked: this.volumeLock
+                });
+            });
+
+            socket.on('set-lock', (lock: boolean) => {
+                console.log('SET LOCK', lock);
+                
+                this.volumeLock = lock;
                 this.io.emit('set-volume', {
                     volume: this.volume,
                     locked: this.volumeLock
