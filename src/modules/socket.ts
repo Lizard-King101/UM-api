@@ -128,6 +128,7 @@ export class Socket {
                         }
                         let result = await this.db.insert('music', insert);
                         console.log(result);
+                        this.io.emit('')
                         socket.emit('song-complete', video_id);
                     }
                 }
