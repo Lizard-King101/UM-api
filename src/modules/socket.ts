@@ -102,30 +102,34 @@ export class Socket {
 
             socket.on('request-song', (video_id: string) => {
                 let handleProgress = (data: Progress) => {
-                    console.log('PROGRESS', data);
-                    socket.emit('song-progress', {
-                        id: video_id,
-                        percent: data.progress.percentage
-                    });
+                    if(data.videoId == video_id) {
+                        console.log('PROGRESS', data);
+                        socket.emit('song-progress', {
+                            id: video_id,
+                            percent: data.progress.percentage
+                        });
+                    }
                 }
                 let handleFinished = async (data: Complete) => {
-                    this.youtube.removeListener('progress', handleProgress);
-                    this.youtube.removeListener('finish', handleFinished);
-                    console.log('COMPLETE', data);
-                    await this.image.download(data.thumbnail, `${data.videoId}.jpg`).catch((err) => {
-                        console.log('Thumbnail download Failed');
-                    });
-                    let insert = {
-                        video_id: data.videoId,
-                        title: data.videoTitle,
-                        artist: data.artist,
-                        tags: '',
-                        client: 1,
-                        added: new Date()
+                    if(data.videoId == video_id) {
+                        this.youtube.removeListener('progress', handleProgress);
+                        this.youtube.removeListener('finish', handleFinished);
+                        console.log('COMPLETE', data);
+                        await this.image.download(data.thumbnail, `${data.videoId}.jpg`).catch((err) => {
+                            console.log('Thumbnail download Failed');
+                        });
+                        let insert = {
+                            video_id: data.videoId,
+                            title: data.videoTitle,
+                            artist: data.artist,
+                            tags: '',
+                            client: 1,
+                            added: new Date()
+                        }
+                        let result = await this.db.insert('music', insert);
+                        console.log(result);
+                        socket.emit('song-complete', video_id);
                     }
-                    let result = await this.db.insert('music', insert);
-                    console.log(result);
-                    socket.emit('song-complete', video_id);
                 }
 
                 this.youtube.on('progress', handleProgress);
@@ -137,8 +141,6 @@ export class Socket {
             socket.on('volume', (volume: number) => {
                 if(this.isAuth(socket.id) || !this.volumeLock) {
                     this.volume = volume;
-                    console.log(volume); 
-                    
                     this.io.emit('set-volume', {
                         volume: this.volume,
                         locked: this.volumeLock,

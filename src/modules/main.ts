@@ -52,8 +52,8 @@ export class Main {
     }
 
     async serverListen() {
-        this.httpServer?.listen(3000, () => {
-            console.log('HTTP listening on port: '+3000);
+        this.httpServer?.listen(3100, () => {
+            console.log('HTTP listening on port: '+3100);
         })
     }
 }
