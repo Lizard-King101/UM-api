@@ -200,12 +200,12 @@ export class Socket {
                             });
                         }
                     }
-                    let handleError = async (data: {id: string, error: string}) => {
+                    let handleError = async (data: {id: string, error: string, details: any}) => {
                         if(data.id == video_id) {
                             this.youtube.removeListener('progress', handleProgress);
                             this.youtube.removeListener('finish', handleFinished);
                             this.youtube.removeListener('error', handleError);
-                            socket.emit('song-error', {id: data.id, message: 'Song Failed to downlaod', error: data.error});
+                            socket.emit('song-error', {id: data.id, message: 'Song Failed to downlaod', error: data.error, details: data.details});
                         }
                     }
                     let handleFinished = async (data: Complete) => {
