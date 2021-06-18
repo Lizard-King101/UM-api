@@ -52,8 +52,9 @@ export class Main {
     }
 
     async serverListen() {
-        this.httpServer?.listen(3100, () => {
-            console.log('HTTP listening on port: '+3100);
+        let httpPort = global.config.production ? global.config.environments.production.httpPort : global.config.environments.development.httpPort 
+        this.httpServer?.listen(httpPort, () => {
+            console.log('HTTP listening on port: '+httpPort);
         })
     }
 }

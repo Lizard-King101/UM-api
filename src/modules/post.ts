@@ -40,11 +40,27 @@ export class POST {
                 this.db.select({
                     table: 'music'
                 }).then((data) => {
-                    console.log(data);
+                    // console.log(data);
                     
                     res.send(data);
+                }).catch((err) => {
+                    res.send(err);
                 })
                 break;
+            case 'update-played':
+                if(POST.video_id) {
+                    this.db.update({
+                        table: 'music',
+                        data: {
+                            last_played: new Date().toISOString()
+                        },
+                        where: `video_id = '${POST.video_id}'`
+                    }).then((result) => {
+                        res.send(result);
+                    }).catch((err) => {
+                        res.send(err);
+                    })
+                }
             default: 
                 res.send({ok: true});
                 break;

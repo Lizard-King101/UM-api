@@ -32,7 +32,7 @@ export class YouTube extends EventEmitter{
 
         this.YD.on('error', (err) => {
             console.log(err);
-            this.emit('error', err);
+            this.emit('error', {id, error: err});
         });
 
         this.YD.on('finished', (err, data: Complete) => {

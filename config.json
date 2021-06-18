@@ -1,11 +1,11 @@
 {
-    "hosts": {
+    "environments": {
         "production": {
             "httpPort": 80,
             "httpsPort": 443
         },
         "development": {
-            "httpPort": 3000,
+            "httpPort": 3100,
             "httpsPort": 3030
         }
     },
@@ -15,5 +15,6 @@
         "user": "music",
         "password": "jR1ad%86"
     },
+    "produciton": false,
     "socketio": true
 }

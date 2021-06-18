@@ -1,5 +1,5 @@
 export interface Config {
-    hosts: {
+    environments: {
         production: HostConfig,
         development: HostConfig
     },
@@ -9,7 +9,8 @@ export interface Config {
         user: string,
         password: string
     }
-    socketio: boolean
+    production: boolean;
+    socketio: boolean;
 }
 
 export interface HostConfig {
