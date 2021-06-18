@@ -5,7 +5,8 @@ export class DataBase {
     connected = false;
     con: any;
     constructor() {
-        this.con = mysql.createConnection(global.config.database);
+        let dbConf = global.config.production ? global.config.environments.production.database : global.config.environments.development.database
+        this.con = mysql.createConnection(dbConf);
     }
 
     query(sql: string){
