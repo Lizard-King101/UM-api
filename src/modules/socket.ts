@@ -205,7 +205,7 @@ export class Socket {
                             this.youtube.removeListener('progress', handleProgress);
                             this.youtube.removeListener('finish', handleFinished);
                             this.youtube.removeListener('error', handleError);
-                            socket.emit('song-error', {id: data.id, message: 'Song Failed to downlaod'});
+                            socket.emit('song-error', {id: data.id, message: 'Song Failed to downlaod', error: data.error});
                         }
                     }
                     let handleFinished = async (data: Complete) => {

@@ -23,6 +23,6 @@
             }
         }
     },
-    "produciton": false,
+    "produciton": true,
     "socketio": true
 }
