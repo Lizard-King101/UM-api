@@ -3,7 +3,7 @@
         "production": {
             "httpPort": 80,
             "httpsPort": 443,
-            "ffmpegPath": "",
+            "ffmpegPath": "/usr/bin/ffmpeg",
             "database": {
                 "host": "45.79.195.37",
                 "database": "uber_music",
@@ -14,7 +14,7 @@
         "development": {
             "httpPort": 3100,
             "httpsPort": 3030,
-            "ffmpegPath": "./ffmpeg/bin/ffmpeg.exe",
+            "ffmpegPath": "ffmpeg/bin/ffmpeg.exe",
             "database": {
                 "host": "45.79.195.37",
                 "database": "uber_music",

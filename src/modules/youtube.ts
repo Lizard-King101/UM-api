@@ -15,7 +15,7 @@ export class YouTube extends EventEmitter{
         super();
         this.musicDir = path.join(global.paths.root, "public/music")
         let ffmpegPath = global.config.production ? global.config.environments.production.ffmpegPath : global.config.environments.development.ffmpegPath
-        if(("./").includes(ffmpegPath.charAt(0))) ffmpegPath = path.join(global.paths.root, ffmpegPath);
+        if(ffmpegPath.charAt(0) != '/') ffmpegPath = path.join(global.paths.root, ffmpegPath);
         this.YD = new YoutubeMp3Downloader({
             ffmpegPath: ffmpegPath,
             outputPath: this.musicDir,
