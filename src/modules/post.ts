@@ -37,15 +37,68 @@ export class POST {
 
         switch(action) {
             case 'get-playlist':
-                this.db.select({
-                    table: 'music'
-                }).then((data) => {
-                    // console.log(data);
-                    
-                    res.send(data);
-                }).catch((err) => {
-                    res.send(err);
+                new Promise((res, rej) => {
+                    let where: string[] = [];
+                    if(POST.filters !== undefined) {
+                        let filters: Filters = POST.filters;
+                        for(let key of Object.keys(filters)) {
+                            let value = filters[key];
+                            let whereStr = where.length ? 'AND ' : '';
+                            switch(key) {
+                                case 'client':
+                                    whereStr += `client = ${value ? '1' : '0'}`;
+                                    break;
+                                default:
+                                    whereStr += `tags ${value ? 'LIKE' : 'NOT LIKE'} '%${key}%'`;
+                                    break;
+                            }
+                            where.push(whereStr);
+                        }
+                    }
+                    this.db.select({
+                        table: 'music',
+                        where
+                    }).then((data) => {
+                        res(data);
+                    }).catch((err) => {
+                        rej(err);
+                    });
+                }).then((result) => {
+                    res.send(result);
+                }).catch((error) => {
+                    res.send({
+                        error,
+                        message: 'Error retreiving playlist'
+                    })
                 })
+                break;
+            case 'set-tags':
+                new Promise((res, rej) => {
+                    if(POST.video_id && POST.tags) {
+                        let id: string = POST.video_id;
+                        let tags: string = typeof POST.tags == 'string' ? POST.tags : Array.isArray(POST.tags) ? POST.tags.join(',') : rej({message: 'Incorrect tags format'});
+                        this.db.update({
+                            table: 'music',
+                            where: `video_id = '${id}'`,
+                            data: {
+                                tags
+                            }
+                        }).then((result) => {
+                            res(result);
+                        }).catch((err) => {
+                            rej(err);
+                        })
+                    } else {
+                        rej('missing id or tags in request');
+                    }
+                }).then((result) => {
+                    res.send(result);
+                }).catch((error) => {
+                    res.send({
+                        error,
+                        message: 'Error settings tags' 
+                    });
+                });
                 break;
             case 'update-played':
                 if(POST.video_id) {
@@ -67,4 +120,8 @@ export class POST {
         }
         
     }
+}
+
+interface Filters {
+    [key:string]: boolean;
 }
