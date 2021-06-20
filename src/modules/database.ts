@@ -31,7 +31,8 @@ export class DataBase {
                     res(result);
                 })
             }).catch((err) => {
-                rej(err + ' ' + sql);
+                err.sql = sql;
+                rej(err);
             })
         })
     }
