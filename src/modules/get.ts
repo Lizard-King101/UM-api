@@ -36,11 +36,11 @@ export class GET {
     
             // res.send('ok');
 
-            console.log({
-                urlArr,
-                GET,
-                protocol
-            })
+            // console.log({
+            //     urlArr,
+            //     GET,
+            //     protocol
+            // })
 
             if(urlArr.length && (['music', 'thumbnails']).includes(urlArr[0])) {
                 let ext = ({music: '.mp3', thumbnails: '.jpg'})[urlArr[0]];
@@ -53,6 +53,8 @@ export class GET {
                 } else {
                     res.status(404).send('file not found');
                 }
+            } else {
+                res.status(404).send('not found');
             }
         }
     }

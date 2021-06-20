@@ -8,15 +8,17 @@ export class YouTube extends EventEmitter{
     private YD: YoutubeMp3Downloader;
     activeDownloads: number = 0;
     maxDownloads: number = 4;
-
+    ffmpegPath: string;
     private musicDir: string;
 
     constructor() {
         super();
         this.musicDir = path.join(global.paths.root, "public/music")
-
+        let ffmpegPath = global.config.production ? global.config.environments.production.ffmpegPath : global.config.environments.development.ffmpegPath
+        if(ffmpegPath.charAt(0) != '/') ffmpegPath = path.join(global.paths.root, ffmpegPath);
+        this.ffmpegPath = ffmpegPath;
         this.YD = new YoutubeMp3Downloader({
-            ffmpegPath: path.join(global.paths.root, "ffmpeg/bin/ffmpeg.exe"),
+            ffmpegPath: this.ffmpegPath,
             outputPath: this.musicDir,
             queueParallelism: this.maxDownloads,
             progressTimeout: 4000,
@@ -32,7 +34,10 @@ export class YouTube extends EventEmitter{
 
         this.YD.on('error', (err) => {
             console.log(err);
-            this.emit('error', err);
+            this.emit('error', {id, error: err, details: {
+                prod: global.config.production,
+                path: this.ffmpegPath
+            }});
         });
 
         this.YD.on('finished', (err, data: Complete) => {

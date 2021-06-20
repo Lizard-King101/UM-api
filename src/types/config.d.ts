@@ -1,21 +1,17 @@
 export interface Config {
-    hosts: {
+    environments: {
         production: HostConfig,
         development: HostConfig
-    },
-    database: {
-        host: string,
-        database: string,
-        user: string,
-        password: string
     }
-    socketio: boolean
+    production: boolean;
+    socketio: boolean;
 }
 
 export interface HostConfig {
     httpPort: number;
     httpsPort: number;
-    database?: DatabaseConfig,
+    ffmpegPath: string;
+    database: DatabaseConfig,
 }
 
 export interface DatabaseConfig {

@@ -5,7 +5,8 @@ export class DataBase {
     connected = false;
     con: any;
     constructor() {
-        this.con = mysql.createConnection(global.config.database);
+        let dbConf = global.config.production ? global.config.environments.production.database : global.config.environments.development.database
+        this.con = mysql.createConnection(dbConf);
     }
 
     query(sql: string){
@@ -20,16 +21,17 @@ export class DataBase {
         })
     }
     
-    select(options: any){
-        return new Promise((res)=>{
-            if(!options.table) res({error: 'No Table defined'});
+    select(options: {table: string, columns?: string[], where?: string[]}): Promise<Array<any>>{
+        return new Promise((res, rej)=>{
+            if(!options.table) rej({error: 'No Table defined'});
             let sql = `SELECT ${options.columns ? options.columns.join(',') : '*'} FROM ${options.table} ${(options.where ? 'WHERE ' + [options.where].join(' ') : '')}`;
             this.Connect().then((err)=>{
-                if(err) res({error: err});
                 this.con.query(sql, (err: any, result: any)=>{
-                    if(err) res({error: err});
+                    if(err) rej(err);
                     res(result);
                 })
+            }).catch((err) => {
+                rej(err);
             })
         })
     }
@@ -43,8 +45,8 @@ export class DataBase {
         })
     }
     
-    update(options: any) {
-        return new Promise((res) => {
+    update(options: {table: string, where: any[] | string, data: any}) {
+        return new Promise((res, rej) => {
             if(options.table && options.data && options.where && (Array.isArray(options.where) || typeof options.where == 'string')) {
                 new Promise((next) => {
                     let set = 'SET ';
@@ -72,11 +74,13 @@ export class DataBase {
                     let where = Array.isArray(options.where) ? options.where.join(' ') : options.where;
                     let sql = `UPDATE ${options.table} ${set} WHERE ${where}`;
                     this.Connect().then((err)=>{
-                        if(err) res({error: err});
+                        if(err) rej(err);
                         this.con.query(sql, (err: any, result: any)=>{
-                            if(err) res({error: err});
+                            if(err) rej(err);
                             res(result);
                         })
+                    }).catch((err) => {
+                        rej(err);
                     })
                 })
             } else {
@@ -185,13 +189,13 @@ export class DataBase {
     }
 
     Connect(){
-        return new Promise((res)=>{
+        return new Promise((res, rej)=>{
             if(this.connected) res(false);
             else {
                 try {
                     this.con.connect((err: any)=>{
                         if(err) {
-                            res(err);
+                            rej(err);
                         } else {
                             this.connected = true;
                             res(false);
