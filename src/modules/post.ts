@@ -43,7 +43,7 @@ export class POST {
                         let filters: Filters = POST.filters;
                         for(let key of Object.keys(filters)) {
                             let value = filters[key];
-                            let whereStr = where.length ? 'AND ' : '';
+                            let whereStr = where.length ? !value ? 'AND ' : 'OR ' : '';
                             switch(key) {
                                 case 'client':
                                     whereStr += `client = ${value ? '1' : '0'}`;
