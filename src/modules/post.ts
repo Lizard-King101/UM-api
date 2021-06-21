@@ -59,7 +59,10 @@ export class POST {
                         table: 'music',
                         where
                     }).then((data) => {
-                        res(data);
+                        res(data.map((r) => {
+                            r.tagArr = r.tags === '' ? [] : r.tags.split(',');
+                            return r;
+                        }));
                     }).catch((err) => {
                         rej(err);
                     });

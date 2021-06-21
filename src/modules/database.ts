@@ -24,7 +24,9 @@ export class DataBase {
     select(options: {table: string, columns?: string[], where?: string[]}): Promise<Array<any>>{
         return new Promise((res, rej)=>{
             if(!options.table) rej({error: 'No Table defined'});
-            let sql = `SELECT ${options.columns ? options.columns.join(',') : '*'} FROM ${options.table} ${(options.where ? 'WHERE ' + [options.where].join(' ') : '')}`;
+            let sql = `SELECT ${options.columns ? options.columns.join(',') : '*'} FROM ${options.table} ${(options.where?.length ? 'WHERE ' + options.where.join(' ') : '')}`;
+            console.log(sql, options.where);
+            
             this.Connect().then((err)=>{
                 this.con.query(sql, (err: any, result: any)=>{
                     if(err) rej(err);
